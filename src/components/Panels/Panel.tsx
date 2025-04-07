@@ -6,10 +6,10 @@ export default function Panel() {
   const { active } = useStore(menuStore)
 
   return (
-    active &&
-
-		<aside className="bg-neutral-900 h-screen w-50 p-3">
-      {active === 'archive' && <FilesPanel />}
-    </aside>
+    active ? (
+      <aside className="bg-neutral-900 h-full w-50 p-3 overflow-y-auto">
+        {active === 'archive' && <FilesPanel />}
+      </aside>
+    ) : null
   )
 }

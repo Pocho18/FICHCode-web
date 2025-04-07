@@ -12,7 +12,7 @@ export default function SideBar() {
   ]
 
   return (
-    <aside className="h-full flex flex-col justify-between">
+    <nav className="h-full flex flex-col justify-between">
         <div className="flex flex-col gap-2">
           {menus.map(({ Icon, label, id })=>(
             <SideBarIcons Icon={Icon} label={label} id={id} setActive={setActive} active={active} key={id} />
@@ -20,6 +20,6 @@ export default function SideBar() {
         </div>
           
         <SideBarIcons Icon={UserCircleIcon} label="Iniciar Sesión" id={"user"} setActive={setActive} active={active} />
-    </aside>
+    </nav>
   )
 }

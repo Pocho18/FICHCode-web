@@ -8,7 +8,7 @@ import { useStore } from "zustand"
 export default function CodeEditor() {
   const monaco = useMonaco() 
   const editorRef = useRef<editor.IStandaloneCodeEditor>(null) 
-	const { active } = useStore(menuStore)
+  const { active } = useStore(menuStore)
   const { activeFile, history } = useStore(fileStore)
   const [code, setCode] = useState(`Algoritmo Ejemplo
   Escribir "Hola mundo"
@@ -75,8 +75,7 @@ FinAlgoritmo`)
     const options = {
       fontSize: width < 576 ? 12 : width < 768 ? 13 : width < 992 ? 14 : 16,
       minimap: { 
-        enabled: width > 768,
-        scale: 0.8
+        enabled: false
       },
       wordWrap: "on",
       lineNumbers: width > 576 ? "on" : "off",
@@ -95,27 +94,16 @@ FinAlgoritmo`)
   useEffect(() => {
     const handleResize = () => {
       updateEditorForScreenSize()
-  	}
+    }
 
     window.addEventListener("resize", handleResize)
     return () => window.removeEventListener("resize", handleResize)
   }, [])
 
-	useEffect(()=>updateEditorForScreenSize(), [active])
+  useEffect(()=>updateEditorForScreenSize(), [active])
 
   return (
-    <div 
-      style={{ 
-        width: "100%", 
-        height: "calc(70vh)",
-        minHeight: "300px",
-        maxWidth: "100%",
-        position: "relative",
-        border: "1px solid #444",
-        borderRadius: "4px",
-        overflow: "hidden"
-      }}
-    >
+    <div className="w-full h-full flex-grow overflow-hidden">
       {monaco && (
         <Editor
           height="100%"
