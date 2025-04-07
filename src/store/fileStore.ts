@@ -1,3 +1,4 @@
+// src/store/fileStore.ts
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
 import { HistoryType } from "../types"
@@ -6,6 +7,7 @@ import { v4 as uuidv4 } from "uuid"
 type FileStoreType = {
     activeFile: string | null,
     history: HistoryType[],
+    openTabs: string[],
     setActiveFile: (id: HistoryType['id'] | null) => void,
     setHistory: (h: HistoryType) => void,
     clearHistory: () => void,
@@ -13,13 +15,17 @@ type FileStoreType = {
     editHistoryContent: (h: HistoryType) => void,
     removeHistory: (id: HistoryType['id']) => void,
     exportFile: (id: HistoryType['id']) => void,
-    getActiveFile: ()=>HistoryType | null
+    getActiveFile: ()=>HistoryType | null,
+    openTab: (id: string) => void,
+    closeTab: (id: string) => void,
+    closeAllTabs: () => void
 }
 
 export const fileStore = create<FileStoreType>()(
     persist(
         (set, get) => ({
             activeFile: null,
+            openTabs: [], 
             history: [
                 {
                     title: "ejemplo.psc", 
@@ -32,10 +38,15 @@ FinAlgoritmo`,
                 },
             ],
             setActiveFile: (id) => {
-                set((state) => ({...state, activeFile: id}))
+                set((state) => {
+                    const openTabs = [...state.openTabs];
+                    if (id && !openTabs.includes(id)) {
+                        openTabs.push(id);
+                    }
+                    return {...state, activeFile: id, openTabs}
+                })
             },
             setHistory: (newFile) => {
-                // Verificar si ya existe un archivo con el mismo nombre
                 const history = get().history
                 const existingFileIndex = history.findIndex(
                     file => file.title.toLowerCase() === newFile.title.toLowerCase()
@@ -50,7 +61,7 @@ FinAlgoritmo`,
                 set((state) => ({...state, history: [...state.history, newFile]}))
             },
             clearHistory: () => {
-                set((state) => ({...state, history: [], activeFile: null}))
+                set((state) => ({...state, history: [], activeFile: null, openTabs: []}))
             },
             editHistoryContent: (h) => {
                 const history = get().history
@@ -69,13 +80,11 @@ FinAlgoritmo`,
                 const history = get().history
                 const editHistoryIndex = history.findIndex(({ id }) => id === hId)
                 if (editHistoryIndex >= 0) {
-                    // Comprobar si ya existe un archivo con ese nombre
                     const existingSameTitle = history.findIndex(
                         (file, index) => index !== editHistoryIndex && 
                         file.title.toLowerCase() === title.toLowerCase()
                     )
                     
-                    // Si existe, añadir un sufijo
                     let finalTitle = title
                     if (existingSameTitle >= 0) {
                         const baseName = title.replace(/\.psc$/, '')
@@ -95,7 +104,6 @@ FinAlgoritmo`,
                 const history = get().history
                 const filteredHistory = history.filter(({ id }) => id !== hId)
                 
-                // Si eliminamos el archivo activo, debemos cambiar activeFile
                 const activeFile = get().activeFile
                 let newActiveFile = activeFile
                 
@@ -103,10 +111,14 @@ FinAlgoritmo`,
                     newActiveFile = filteredHistory.length > 0 ? filteredHistory[0].id : null
                 }
                 
+                // También eliminar de openTabs
+                const openTabs = get().openTabs.filter(id => id !== hId)
+                
                 set((state) => ({
                     ...state, 
                     history: filteredHistory,
-                    activeFile: newActiveFile
+                    activeFile: newActiveFile,
+                    openTabs
                 }))
             },
             exportFile: (id) => {
@@ -134,6 +146,51 @@ FinAlgoritmo`,
                 const activeIndex = get().history.findIndex(({id})=>id === get().activeFile)
                 if (activeIndex !== -1) return get().history[activeIndex]
                 else return null
+            },
+            openTab: (id) => {
+                set((state) => {
+                    if (!state.openTabs.includes(id)) {
+                        return {
+                            ...state,
+                            openTabs: [...state.openTabs, id],
+                            activeFile: id
+                        }
+                    }
+                    return { ...state, activeFile: id }
+                })
+            },
+            closeTab: (id) => {
+                set((state) => {
+                    const openTabs = state.openTabs.filter(tabId => tabId !== id)
+                    let newActiveFile = state.activeFile
+                    
+                    // If we're closing the active tab, select another one
+                    if (state.activeFile === id) {
+                        // Get the index of the closed tab
+                        const closedIndex = state.openTabs.indexOf(id)
+                        
+                        if (openTabs.length > 0) {
+                            // Try to select the tab to the right, or if it was the rightmost, select the one to the left
+                            const newIndex = closedIndex < openTabs.length ? closedIndex : openTabs.length - 1
+                            newActiveFile = openTabs[newIndex]
+                        } else {
+                            newActiveFile = null
+                        }
+                    }
+                    
+                    return {
+                        ...state,
+                        openTabs,
+                        activeFile: newActiveFile
+                    }
+                })
+            },
+            closeAllTabs: () => {
+                set((state) => ({
+                    ...state,
+                    openTabs: [],
+                    activeFile: null
+                }))
             }
         }),
         {

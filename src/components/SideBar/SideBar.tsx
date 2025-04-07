@@ -12,7 +12,7 @@ export default function SideBar() {
   ]
 
   return (
-    <nav className="h-full flex flex-col justify-between">
+    <nav className="h-full flex flex-col justify-between bg-neutral-900 pt-1">
         <div className="flex flex-col gap-2">
           {menus.map(({ Icon, label, id })=>(
             <SideBarIcons Icon={Icon} label={label} id={id} setActive={setActive} active={active} key={id} />

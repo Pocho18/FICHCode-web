@@ -1,5 +1,19 @@
 @import "tailwindcss";
 
-body {
-    overflow: hidden;
+@layer base {
+    body {
+        overflow: hidden;
+    }
+    button {
+        cursor: pointer;
+    }
+    /* Hide scrollbar for tabs panel but keep functionality */
+    .hide-scrollbar {
+        -ms-overflow-style: none;  /* IE and Edge */
+        scrollbar-width: none;  /* Firefox */
+    }
+
+    .hide-scrollbar::-webkit-scrollbar {
+        display: none;  /* Chrome, Safari and Opera */
+    }
 }

@@ -1,15 +1,17 @@
 import { fileStore } from "@/store/fileStore"
-import { menuStore } from "@/store/menuStore"
 import { Editor, useMonaco } from "@monaco-editor/react"
-import { editor } from "monaco-editor"
-import { useEffect, useState, useRef } from "react"
+import { useEffect, useState } from "react"
 import { useStore } from "zustand"
+import { HistoryType } from "../types"
 
 export default function CodeEditor() {
   const monaco = useMonaco() 
-  const editorRef = useRef<editor.IStandaloneCodeEditor>(null) 
-  const { active } = useStore(menuStore)
-  const { activeFile, history } = useStore(fileStore)
+  const { 
+    activeFile, 
+    history, 
+    editHistoryContent, 
+    markAsModified 
+  } = useStore(fileStore)
   const [code, setCode] = useState(`Algoritmo Ejemplo
   Escribir "Hola mundo"
 FinAlgoritmo`)
@@ -67,41 +69,19 @@ FinAlgoritmo`)
     })
   }, [monaco])
 
-  // Función para configurar el editor basado en el tamaño de la ventana
-  const updateEditorForScreenSize = () => {
-    if (!editorRef.current) return
-
-    const width = window.innerWidth
-    const options = {
-      fontSize: width < 576 ? 12 : width < 768 ? 13 : width < 992 ? 14 : 16,
-      minimap: { 
-        enabled: false
-      },
-      wordWrap: "on",
-      lineNumbers: width > 576 ? "on" : "off",
+  // Manejar cambios en el código
+  const handleCodeChange = (value?: string) => {
+    setCode(value || "")
+    
+    // Marcar el archivo como modificado y actualizar su contenido
+    if (activeFile && value) {
+      markAsModified(activeFile)
+      editHistoryContent({
+        id: activeFile,
+        content: value
+      } as HistoryType)
     }
-
-    // Actualizar opciones del editor
-    editorRef.current.updateOptions(options as editor.IEditorOptions)
-    editorRef.current.layout()
   }
-
-  const handleEditorDidMount = (editor: editor.IStandaloneCodeEditor) => {
-    editorRef.current = editor
-    updateEditorForScreenSize() 
-  }
-
-  useEffect(() => {
-    const handleResize = () => {
-      updateEditorForScreenSize()
-    }
-
-    window.addEventListener("resize", handleResize)
-    return () => window.removeEventListener("resize", handleResize)
-  }, [])
-
-  useEffect(()=>updateEditorForScreenSize(), [active])
-
   return (
     <div className="w-full h-full flex-grow overflow-hidden">
       {monaco && (
@@ -109,10 +89,9 @@ FinAlgoritmo`)
           height="100%"
           width="100%"
           defaultLanguage="pseudocodigo"
-          defaultValue={code}
+          value={code}
           theme="pseudotheme"
-          onChange={(value) => setCode(value || "")}
-          onMount={handleEditorDidMount}
+          onChange={handleCodeChange}
           options={{
             scrollBeyondLastLine: false,
             automaticLayout: true,

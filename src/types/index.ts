@@ -6,3 +6,7 @@ export type HistoryType = {
     content: string,
     id: string
 }
+export type TabType = {
+    title: HistoryType['title'],
+    id: HistoryType['id']
+}

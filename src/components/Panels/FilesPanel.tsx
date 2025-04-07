@@ -1,3 +1,4 @@
+// src/components/Panels/FilesPanel.tsx
 import { fileStore } from "@/store/fileStore";
 import { HistoryType } from "@/types/index";
 import { DocumentPlusIcon, TrashIcon } from "@heroicons/react/24/outline";
@@ -16,13 +17,15 @@ export default function FilesPanel() {
     removeHistory, 
     setHistory, 
     setActiveFile, 
-    activeFile 
+    activeFile,
+    openTab // Add openTab function from store
   } = useStore(fileStore)
   const [editingId, setEditingId] = useState<HistoryType['id'] | null>(null)
   const editableRef = useRef<HTMLInputElement>(null)
 
   // EVENTS HANDLERS
-  const handleClickFile = (id: string) => setActiveFile(id)
+  // Update to open files in tabs
+  const handleClickFile = (id: string) => openTab(id)
 
   // Eliminar archivo
   const handleRemoveHistory = (id: HistoryType['id']) => {
@@ -72,7 +75,7 @@ export default function FilesPanel() {
         createdAt: files[0].lastModified
       }
       setHistory(newHistory)
-      setActiveFile(newHistory.id)
+      openTab(newHistory.id) // Open the file in a tab instead of just setting active file
     }
     reader.onerror = () => {
       console.error("Error al leer el archivo")
@@ -91,7 +94,7 @@ export default function FilesPanel() {
       createdAt: Date.now()
     }
     setHistory(newFile)
-    setActiveFile(newFile.id)
+    openTab(newFile.id) // Open the new file in a tab
     setTimeout(() => setEditingId(newFile.id), 100)
   }
 
