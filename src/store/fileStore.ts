@@ -8,6 +8,7 @@ type FileStoreType = {
     activeFile: string | null,
     history: HistoryType[],
     openTabs: string[],
+    modifiedFiles: string[],  // Nueva propiedad para rastrear archivos modificados
     setActiveFile: (id: HistoryType['id'] | null) => void,
     setHistory: (h: HistoryType) => void,
     clearHistory: () => void,
@@ -18,7 +19,11 @@ type FileStoreType = {
     getActiveFile: ()=>HistoryType | null,
     openTab: (id: string) => void,
     closeTab: (id: string) => void,
-    closeAllTabs: () => void
+    closeAllTabs: () => void,
+    reorderTabs: (sourceIndex: number, targetIndex: number) => void,  // Nueva función
+    markAsModified: (id: HistoryType['id']) => void,  // Ya existía, pero aseguramos que actualice modifiedFiles
+    markAsSaved: (id: HistoryType['id']) => void,  // Nueva función
+    getModifiedFiles: () => string[],  // Nueva función
 }
 
 export const fileStore = create<FileStoreType>()(
@@ -26,6 +31,7 @@ export const fileStore = create<FileStoreType>()(
         (set, get) => ({
             activeFile: null,
             openTabs: [], 
+            modifiedFiles: [],  // Inicializar array de archivos modificados
             history: [
                 {
                     title: "ejemplo.psc", 
@@ -61,7 +67,7 @@ FinAlgoritmo`,
                 set((state) => ({...state, history: [...state.history, newFile]}))
             },
             clearHistory: () => {
-                set((state) => ({...state, history: [], activeFile: null, openTabs: []}))
+                set((state) => ({...state, history: [], activeFile: null, openTabs: [], modifiedFiles: []}))
             },
             editHistoryContent: (h) => {
                 const history = get().history
@@ -114,11 +120,15 @@ FinAlgoritmo`,
                 // También eliminar de openTabs
                 const openTabs = get().openTabs.filter(id => id !== hId)
                 
+                // Eliminar de modifiedFiles
+                const modifiedFiles = get().modifiedFiles.filter(id => id !== hId)
+                
                 set((state) => ({
                     ...state, 
                     history: filteredHistory,
                     activeFile: newActiveFile,
-                    openTabs
+                    openTabs,
+                    modifiedFiles
                 }))
             },
             exportFile: (id) => {
@@ -141,6 +151,9 @@ FinAlgoritmo`,
                 // Limpiar
                 document.body.removeChild(a)
                 URL.revokeObjectURL(url)
+                
+                // Marcar como guardado después de exportar
+                get().markAsSaved(id)
             },
             getActiveFile: ()=>{
                 const activeIndex = get().history.findIndex(({id})=>id === get().activeFile)
@@ -191,6 +204,38 @@ FinAlgoritmo`,
                     openTabs: [],
                     activeFile: null
                 }))
+            },
+            reorderTabs: (sourceIndex, targetIndex) => {
+                set((state) => {
+                    const newOpenTabs = [...state.openTabs];
+                    const [movedItem] = newOpenTabs.splice(sourceIndex, 1);
+                    newOpenTabs.splice(targetIndex, 0, movedItem);
+                    
+                    return {
+                        ...state,
+                        openTabs: newOpenTabs
+                    };
+                });
+            },
+            markAsModified: (id) => {
+                set((state) => {
+                    if (!state.modifiedFiles.includes(id)) {
+                        return {
+                            ...state,
+                            modifiedFiles: [...state.modifiedFiles, id]
+                        };
+                    }
+                    return state;
+                });
+            },
+            markAsSaved: (id) => {
+                set((state) => ({
+                    ...state,
+                    modifiedFiles: state.modifiedFiles.filter(fileId => fileId !== id)
+                }));
+            },
+            getModifiedFiles: () => {
+                return get().modifiedFiles;
             }
         }),
         {

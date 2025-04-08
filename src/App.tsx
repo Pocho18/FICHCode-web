@@ -15,7 +15,7 @@ export default function App() {
         <Panel />
       </header>
 
-      <main className="grow flex overflow-hidden flex-col">
+      <main className="grow flex overflow-hidden flex-col bg-neutral-800">
         <section>
           <ActionBar />
         </section>
