@@ -147,7 +147,7 @@ export default function FilesPanel() {
         </div>
 
         {history.length > 0 ? (
-          <div className="space-y-2 max-h-96 overflow-y-auto">
+          <div className="space-y-2 max-h-96 overflow-hidden">
             {history.map(({ title, id }) => {
               const isEditing = editingId === id
               const isActive = activeFile === id

@@ -11,7 +11,7 @@ import { useEffect, useState } from "react"
 import { useStore } from "zustand"
 
 export default function ActionBar() {
-  const { activeFile, getActiveFile, exportFile, removeHistory } = useStore(fileStore)
+  const { activeFile, history, getActiveFile, exportFile, removeHistory } = useStore(fileStore)
   const [active, setActive] = useState<HistoryType | null>(null)
   const [exec, setExec] = useState(false)
   const [isRunning, setIsRunning] = useState(false)
@@ -19,9 +19,9 @@ export default function ActionBar() {
   const [timer, setTimer] = useState<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
-    if (!activeFile) return
+    if (!activeFile) return setActive(null)
     setActive(getActiveFile())
-  }, [activeFile, getActiveFile])
+  }, [activeFile, history, getActiveFile])
 
   // Simular ejecución de código
   const handleExecution = () => {
@@ -31,10 +31,22 @@ export default function ActionBar() {
       setIsRunning(false)
       setExec(false)
       setExecutionTime(0)
+      
+      // Disparar evento de detención
+      const stopEvent = new CustomEvent('fichcode-execution', {
+        detail: { action: 'stop' }
+      });
+      window.dispatchEvent(stopEvent);
     } else {
       // Iniciar ejecución
       setIsRunning(true)
       setExec(true)
+      
+      // Disparar evento de inicio
+      const startEvent = new CustomEvent('fichcode-execution', {
+        detail: { action: 'start' }
+      });
+      window.dispatchEvent(startEvent);
       
       // Simular tiempo de ejecución
       const interval = setInterval(() => {
@@ -43,11 +55,37 @@ export default function ActionBar() {
       
       setTimer(interval)
       
+      // Extraer sentencias de escritura (Escribir) del pseudocódigo
+      const currentFile = getActiveFile();
+      if (currentFile) {
+        const content = currentFile.content;
+        const writeStatements = content.match(/Escribir\s+"([^"]*)"/g) || [];
+        
+        // Simular la salida de las sentencias de escritura
+        let delay = 500;
+        writeStatements.forEach((statement) => {
+          setTimeout(() => {
+            const text = statement.match(/Escribir\s+"([^"]*)"/)?.[1] || '';
+            const outputEvent = new CustomEvent('fichcode-execution', {
+              detail: { action: 'output', data: text }
+            });
+            window.dispatchEvent(outputEvent);
+          }, delay);
+          delay += 500;
+        });
+      }
+      
       // Detener automáticamente después de 5 segundos (simulación)
       setTimeout(() => {
         clearInterval(interval)
         setIsRunning(false)
         setExec(false)
+        
+        // Disparar evento de finalización
+        const stopEvent = new CustomEvent('fichcode-execution', {
+          detail: { action: 'stop' }
+        });
+        window.dispatchEvent(stopEvent);
       }, 5000)
     }
   }
@@ -77,8 +115,8 @@ export default function ActionBar() {
   return (
     <aside className="flex w-full text-neutral-300 py-2 px-4 items-center justify-between border-b border-neutral-700 bg-neutral-900">
       <div className="flex items-center gap-2">
-        <h2 className="text-xl font-bold truncate max-w-60">
-          {active?.title || "Sin archivo"}
+        <h2 className="text-xl font-bold truncate max-w-60" title={active ? active.title:''}>
+          {`FICHCode ${active ? `- ${active.title}`:''}`}
         </h2>
         
         {isRunning && (

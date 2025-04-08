@@ -18,6 +18,7 @@ export default function CodeEditor() {
 FinAlgoritmo`)
   
   useEffect(()=>{
+    console.log(activeFile)
     if (!activeFile) return
     const historyIndex = history.findIndex(({ id }) => id === activeFile)
     setCode(history[historyIndex].content)
@@ -274,7 +275,7 @@ FinAlgoritmo`)
             automaticLayout: true,
             fontFamily: "Cascadia Code PL, monospace",
             fontSize: 14,
-            minimap: { enabled: true },
+            minimap: { enabled: false },
             lineNumbers: "on",
             folding: true,
             wordWrap: "on",

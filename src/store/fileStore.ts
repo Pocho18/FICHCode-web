@@ -60,7 +60,7 @@ FinAlgoritmo`,
                 
                 if (existingFileIndex >= 0) {
                     const baseName = newFile.title.replace(/\.psc$/, '')
-                    const newTitle = `${baseName}_copy.psc`
+                    const newTitle = `${baseName}-(${existingFileIndex+1}).psc`
                     newFile.title = newTitle
                 }
                 

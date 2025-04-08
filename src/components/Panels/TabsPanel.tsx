@@ -154,7 +154,7 @@ export default function FileTabs() {
                 {isModified && (
                   <span className="w-2 h-2 rounded-full bg-indigo-500 mr-2" title="Archivo modificado"></span>
                 )}
-                <span className="text-sm truncate" title={file.title}>
+                <span className="text-sm truncate max-w-20" title={file.title}>
                   {file.title}
                 </span>
               </div>

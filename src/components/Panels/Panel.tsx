@@ -7,7 +7,7 @@ export default function Panel() {
 
   return (
     active ? (
-      <aside className="bg-neutral-900 h-full w-50 p-3 overflow-y-auto">
+      <aside className="bg-neutral-900 h-full w-50 p-3 overflow-y-auto border-r-[3px] border-neutral-800">
         {active === 'archive' && <FilesPanel />}
       </aside>
     ) : null
