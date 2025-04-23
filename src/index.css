@@ -1,0 +1,33 @@
+@import "tailwindcss";
+
+@theme {
+    --color-bg: #21252b;
+    --color-panel: #181a1f;
+    --color-text: #abb2bf;
+    --color-comment: #5c6370;
+    --color-keyword: #c678dd;
+    --color-string: #98c379;
+    --color-boolean: #e06c75;
+    --color-number: #d19a66;
+    --color-operator: #56b6c2;
+    --color-identifier: #e5c07b;
+    --color-accent: #61afef;
+    --color-selection: rgba(200,200,200,.2);
+    --color-linenumber: #636d83;
+    --color-cursor: #528bff;
+    --color-hover: rgba(200,200,200,.1);
+}
+
+@layer base {
+    html, body, #root {
+        @apply h-full;
+    }
+
+    ul, li {
+        list-style: none;
+    }
+
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
+}
