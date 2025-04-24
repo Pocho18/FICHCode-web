@@ -1,4 +1,5 @@
 import { fileStore } from "@/contexts/fileStore"
+import { exec } from "@/lib/Interpreter"
 import { ChangeEvent } from "react"
 import { useStore } from "zustand"
 
@@ -74,6 +75,13 @@ export default function useFiles(){
 		const fileInfo = getFileInfo(activeFile)
 		if (!fileInfo) return
 		addFile({...fileInfo, createdAt: new Date().toDateString(), updatedAt: new Date().toDateString()})
+	}
+
+	// ---------------------- DUPLICAR ARCHIVO ----------------------------
+	const handleExecFile = ()=>{
+		const fileInfo = getFileInfo(activeFile)
+		if (!fileInfo) return
+		exec(fileInfo.content)
 	}
 	
 	return { handleCreateFile, handleOpenFile, handleDuplicateFile }

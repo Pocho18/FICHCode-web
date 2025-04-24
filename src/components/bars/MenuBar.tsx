@@ -57,7 +57,7 @@ export default function MenuBar({ items }: MenuBarProps) {
 								<button key={label} className='hover:bg-hover transition-colors duration-150 py-1 px-2 rounded-sm flex items-center w-full gap-2 relative cursor-pointer z-20'>
 									{ Icon && <Icon className={`w-5 h-5 ${strokeIcon} ${iconColor}`} /> }
 									<p>{label}</p>
-									{type === "file" && <input type={type} onChange={handleEvent} className='absolute w-full h-full opacity-0 z-10' />}
+									{type === "file" && <input type={type} accept='*.psc' onChange={handleEvent} className='absolute w-full h-full opacity-0 z-10' />}
 									{type !== "file" && <input type={type} onClick={handleEvent as ()=>void} className='absolute w-full h-full opacity-0 z-10 cursor-pointer'/>}
 								</button>
 							)

@@ -20,7 +20,8 @@
 
 @layer base {
     html, body, #root {
-        @apply h-full;
+        @apply h-full max-h-screen;
+
     }
 
     ul, li {

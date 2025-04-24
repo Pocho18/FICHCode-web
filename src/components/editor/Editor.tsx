@@ -149,11 +149,11 @@ export default function Editor() {
       <MonacoEditor
         onMount={handleEditorDidMount}
         width="100%"
-        height="100%"
+        height="95.5%"
         defaultLanguage="fichlang"
         theme="fich-dark"
         options={{
-          fontFamily: "Cascadia Code, monospace",
+          fontFamily: "Cascadia Code PL, monospace",
           fontSize: 14,
           minimap: { enabled: false },
           scrollBeyondLastLine: false,
