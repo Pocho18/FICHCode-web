@@ -6,7 +6,7 @@ import { useState, useRef, useEffect } from "react";
 import { useStore } from "zustand";
 
 export default function TabsBar() {
-  const { openFiles, activeFile, setActiveFile, getFileInfo, removeOpenFile } = useStore(fileStore);
+  const { openFiles, activeFile, getFileInfo, removeOpenFile } = useStore(fileStore);
   const { handleCreateFile, handleDuplicateFile } = useFiles()
   const tabsContainerRef = useRef<HTMLDivElement>(null);
   const [showLeftScroll, setShowLeftScroll] = useState(false);
@@ -126,7 +126,6 @@ export default function TabsBar() {
                 name={fileInfo.name} 
                 id={id} 
                 isActive={activeFile === id} 
-                setActiveFile={setActiveFile} 
                 removeOpenFile={removeOpenFile} 
               />
             );
@@ -175,7 +174,7 @@ export default function TabsBar() {
           aria-label="Ejecutar código"
           title="Ejecutar"
         >
-          <PlayIcon className="w-4 h-4" />
+          <PlayIcon className="w-4 h-4"/>
           <span className="text-sm">EJEC.</span>
         </button>
       </div>
@@ -190,22 +189,16 @@ type TabItemProps = {
   name: FileType['name']
   id: string
   isActive: boolean
-  setActiveFile: FileStoreType['setActiveFile'],
   removeOpenFile: FileStoreType['removeOpenFile']
 }
 
-function TabItem({ name, isActive, id, setActiveFile, removeOpenFile }: TabItemProps) {
+function TabItem({ name, isActive, id, removeOpenFile }: TabItemProps) {
   
   const handleClose = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.stopPropagation()
     setTimeout(() => removeOpenFile(id), 100);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      setActiveFile(id);
-    }
-  };
 
   return (
     <motion.div
@@ -213,8 +206,6 @@ function TabItem({ name, isActive, id, setActiveFile, removeOpenFile }: TabItemP
       initial={false}
       exit={{ opacity: 0, width: 0 }}
       transition={{ duration: 0.1 }}
-      onClick={() => setActiveFile(id)}
-      onKeyDown={handleKeyDown}
       tabIndex={0}
       role="tab"
       aria-selected={isActive}
